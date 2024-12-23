@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta charset="UTF-8" />
+  <title>URDF Element</title>
+
+  <script src="./webcomponents-bundle.js"></script>
+  <link href="./assets/main.css" type="text/css" rel="stylesheet" />
+  <link href="./assets/font.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body tabindex="0">
+
+  <div id="menu">
+    <ul id="urdf-options">
+      <li urdf="./urdf/GR1T1.urdf" color="#0086D1">GR1T1</li>
+      <li urdf="./urdf/GRMini1T1_most_body_raw_imitation.urdf" color="#0086D1">GRMini1T1</li>
+    </ul>
+
+    <div id="controls" class="hidden">
+      <div id="toggle-controls"></div>
+      <div>Drag and drop URDF files or folders! <br /></div>
+      <div id="ignore-joint-limits" class="toggle">Ignore Joint Limits</div>
+      <div id="hide-fixed" class="toggle">Hide Fixed Joints</div>
+      <div id="radians-toggle" class="toggle">Use Radians</div>
+      <div id="autocenter-toggle" class="toggle checked">Autocenter</div>
+      <div id="collision-toggle" class="toggle">Show Collision</div>
+      <!-- <div id="do-animate" class="toggle">Animate Joints</div> -->
+      <label>
+        Up Axis
+        <select id="up-select">
+          <option value="+X">+X</option>
+          <option value="-X">-X</option>
+          <option value="+Y">+Y</option>
+          <option value="-Y">-Y</option>
+          <option value="+Z" selected>+Z</option>
+          <option value="-Z">-Z</option>
+        </select>
+      </label>
+      <ul></ul>
+    </div>
+  </div>
+  <urdf-viewer up="+Z" display-shadow tabindex="0"></urdf-viewer>
+
+  <script src="./src/index.js" type="module"></script>
+</body>
+
+</html>
