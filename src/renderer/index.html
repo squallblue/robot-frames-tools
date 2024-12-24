@@ -6,24 +6,26 @@
   <meta charset="UTF-8" />
   <title>URDF Element</title>
 
-  <script src="./webcomponents-bundle.js"></script>
   <link href="./assets/main.css" type="text/css" rel="stylesheet" />
   <link href="./assets/font.css" type="text/css" rel="stylesheet" />
+  <link href="./notyf.min.css" type="text/css" rel="stylesheet" />
+  <script src="./webcomponents-bundle.js"></script>
+  <script src="./notyf.min.js"></script>
 </head>
 
 <body tabindex="0">
 
   <div id="menu">
     <ul id="urdf-options">
-      <li urdf="./urdf/GR1T1.urdf" color="#0086D1">GR1T1</li>
-      <li urdf="./urdf/GRMini1T1_most_body_raw_imitation.urdf" color="#0086D1">GRMini1T1</li>
+      <!-- <li urdf="./urdf/GR1T1.urdf" color="#0086D1">GR1T1</li> -->
+      <li urdf="./urdf/GRMini1T1_raw.urdf" color="#0086D1">GRMini1T1</li>
     </ul>
 
-    <div id="controls" class="hidden">
+    <div id="controls" class="hidden hide-fixed">
       <div id="toggle-controls"></div>
       <div>Drag and drop URDF files or folders! <br /></div>
       <div id="ignore-joint-limits" class="toggle">Ignore Joint Limits</div>
-      <div id="hide-fixed" class="toggle">Hide Fixed Joints</div>
+      <div id="hide-fixed" class="toggle checked">Hide Fixed Joints</div>
       <div id="radians-toggle" class="toggle">Use Radians</div>
       <div id="autocenter-toggle" class="toggle checked">Autocenter</div>
       <div id="collision-toggle" class="toggle">Show Collision</div>
@@ -39,7 +41,17 @@
           <option value="-Z">-Z</option>
         </select>
       </label>
-      <ul></ul>
+      <ul>
+        <li class="flex">
+          <!-- 上传文件，限定单个文件，JSON -->
+          <input type="file" id="file-input" style="display: none;" accept=".json" />
+          <button id="output-data">复制数据</button>
+          <button id="record-data" class="replaying-hide record-show">录制数据</button>
+          <button id="replay-data" class="replaying-hide record-hide">回放数据</button>
+          <button style="display: none;" id="replay-stop" class="replaying-show record-hide">停止回放</button>
+          <button style="display: none;" id="replay-pause" class="replaying-show record-hide">暂停</button>
+        </li>
+      </ul>
     </div>
   </div>
   <urdf-viewer up="+Z" display-shadow tabindex="0"></urdf-viewer>

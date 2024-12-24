@@ -5,7 +5,6 @@ import URDFLoader from './URDFLoader.js';
 
 const tempVec2 = new THREE.Vector2();
 const emptyRaycast = () => {};
-
 // urdf-viewer element
 // Loads and displays a 3D view of a URDF-formatted robot
 
@@ -157,6 +156,94 @@ class URDFViewer extends HTMLElement {
         this.plane = plane;
         this.directionalLight = dirLight;
         this.ambientLight = ambientLight;
+        this.recordingData = [];
+        this.replayPos = 0;
+        this.replaying = false
+        this.replayData = []
+        this.outputDataBtn = document.querySelector('#output-data')
+        this.paused = false
+        this.recording = false
+        this.notyf = new Notyf({ position: { x: 'center', y: 'top' } });
+
+        this.outputDataBtn.addEventListener('click', () => {
+            const keys = Object.keys(this.robot.joints);
+            const data = {}
+            keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
+            // 复制到剪贴板
+            navigator.clipboard.writeText(JSON.stringify(data))
+            this.notyf.success('数据已复制到剪贴板')
+        })
+
+        this.replayBtn = document.querySelector('#replay-data')
+        this.stopReplayBtn = document.querySelector('#replay-stop')
+        this.uploadInput = document.querySelector('#file-input')
+        this.pauseBtn = document.querySelector('#replay-pause')
+        this.recordBtn = document.querySelector('#record-data')
+
+        this.pauseBtn.addEventListener('click', () => {
+            this.paused = !this.paused
+            this.pauseBtn.innerText = this.paused ? '继续' : '暂停'
+        })
+
+        this.replayingShowBtns = document.querySelectorAll('.replaying-show')
+        this.replayingHideBtns = document.querySelectorAll('.replaying-hide')
+        this.recordShowBtns = document.querySelectorAll('.record-show')
+        this.recordHideBtns = document.querySelectorAll('.record-hide')
+
+        this.replayBtn.addEventListener('click', () => {
+            this.uploadInput.click()
+            // 获取文件
+            this.uploadInput.addEventListener('change', (e) => {
+                // json文件读取
+                const file = e.target.files[0]
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    try {
+                        this.replayData = JSON.parse(e.target.result)
+                        this.replaying = true
+                        this.replayingHideBtns.forEach(btn => btn.style.display = 'none')
+                        this.replayingShowBtns.forEach(btn => btn.style.display = 'block')
+                    } catch (err) {
+                        console.error('文件读取失败')
+                        this.notyf.error('文件读取失败')
+                    }
+                }
+                reader.readAsText(file)
+            })
+        })
+
+        this.recordBtn.addEventListener('click', () => {
+            this.recording = !this.recording
+            this.recordBtn.innerText = this.recording ? '停止录制' : '开始录制'
+            if (!this.recording) {
+                // 保存数据写到JSON中并下载
+                const dataStr = JSON.stringify(this.recordingData)
+                const blob = new Blob([dataStr], { type: 'application/json' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                // 文件名为时间戳
+                a.download = `${new Date().getTime()}.json`
+                a.click()
+                URL.revokeObjectURL(url)
+                this.recordingData = []
+            }
+        })
+
+        
+        this.stopReplayBtn.addEventListener('click', () => {
+            // 清除上传的文件
+            this.uploadInput.value = ''
+            this.replayData = []
+            this.replaying = false
+            this.replayPos = 0
+            this.paused = false
+            this.pauseBtn.innerText = '暂停'
+            this.replayingHideBtns.forEach(btn => btn.style.display = 'block')
+            this.replayingShowBtns.forEach(btn => btn.style.display = 'none')
+        })
+
+
 
         this._setUp(this.up);
 
@@ -172,6 +259,21 @@ class URDFViewer extends HTMLElement {
         });
 
         const _renderLoop = () => {
+            if (this.replaying && this.paused) {
+                this._renderLoopId = requestAnimationFrame(_renderLoop);
+                return
+            }
+            if (this.recording && this.robot) {
+                const keys = Object.keys(this.robot.joints);
+                const data = {}
+                keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
+                this.recordingData.push(data);
+            } else if (this.replaying && this.robot) {
+                if (this.replayPos >= this.replayData.length) {
+                    this.replayPos = 0;
+                }
+                this.setJointValues(this.replayData[this.replayPos++]);
+            }
 
             if (this.parentNode) {
 
@@ -183,7 +285,6 @@ class URDFViewer extends HTMLElement {
 
                         this._updateEnvironment();
                     }
-
                     this.renderer.render(scene, camera);
                     this._dirty = false;
 
@@ -199,6 +300,14 @@ class URDFViewer extends HTMLElement {
         };
         _renderLoop();
 
+        
+        if (!window.setJointValue) {
+            window.setJointValue = this.setJointValue.bind(this);
+        }
+
+    }
+
+    autoMove() {
     }
 
     connectedCallback() {
@@ -319,7 +428,6 @@ class URDFViewer extends HTMLElement {
     // Set the joint with jointName to
     // angle in degrees
     setJointValue(jointName, ...values) {
-
         if (!this.robot) return;
         if (!this.robot.joints[jointName]) return;
 

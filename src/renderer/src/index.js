@@ -293,7 +293,7 @@ document.addEventListener('WebComponentsReady', () => {
 
     registerDragEvents(viewer, () => {
         setColor('#263238');
-        animToggle.classList.remove('checked');
+        // animToggle.classList.remove('checked');
         updateList();
     });
 
@@ -301,7 +301,6 @@ document.addEventListener('WebComponentsReady', () => {
 
 // init 2D UI and animation
 const updateAngles = () => {
-
     if (!viewer.setJointValue) return;
 
     // reset everything to 0 first
@@ -370,7 +369,7 @@ document.addEventListener('WebComponentsReady', () => {
     // stop the animation if user tried to manipulate the model
     viewer.addEventListener('manipulate-start', e => animToggle.classList.remove('checked'));
     viewer.addEventListener('urdf-processed', e => updateAngles());
-    updateLoop();
+    // updateLoop();
     viewer.camera.position.set(1.5, 1, -1.5);
 
 });
