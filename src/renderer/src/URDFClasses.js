@@ -256,16 +256,15 @@ class URDFJoint extends URDFBase {
             }
 
             case 'floating': {
-
                 // no-op if all values are identical to existing value or are null
                 if (this.jointValue.every((value, index) => values[index] === value || values[index] === null)) return didUpdate;
                 // Floating joints have six degrees of freedom: X, Y, Z, R, P, Y.
-                this.jointValue[0] = values[0] !== null ? values[0] : this.jointValue[0];
-                this.jointValue[1] = values[1] !== null ? values[1] : this.jointValue[1];
-                this.jointValue[2] = values[2] !== null ? values[2] : this.jointValue[2];
-                this.jointValue[3] = values[3] !== null ? values[3] : this.jointValue[3];
-                this.jointValue[4] = values[4] !== null ? values[4] : this.jointValue[4];
-                this.jointValue[5] = values[5] !== null ? values[5] : this.jointValue[5];
+                this.jointValue[0] = (values[0] !== null ? values[0] : this.jointValue[0]) || 0;
+                this.jointValue[1] = (values[1] !== null ? values[1] : this.jointValue[1]) || 0;
+                this.jointValue[2] = (values[2] !== null ? values[2] : this.jointValue[2]) || 0;
+                this.jointValue[3] = (values[3] !== null ? values[3] : this.jointValue[3]) || 0;
+                this.jointValue[4] = (values[4] !== null ? values[4] : this.jointValue[4]) || 0;
+                this.jointValue[5] = (values[5] !== null ? values[5] : this.jointValue[5]) || 0;
 
                 // Compose transform of joint origin and transform due to joint values
                 _tempOrigTransform.compose(this.origPosition, this.origQuaternion, _tempScale);
