@@ -5,7 +5,7 @@
 <robot
         name="GRMini1T1">
     <link
-            name="world">
+            name="world_pitch">
         <inertial>
             <origin
                     xyz="0 0 0"
@@ -22,15 +22,92 @@
         </inertial>
     </link>
     <joint
-            name="floating_base_joint"
-            type="floating">
+            name="floating_base_pitch_joint"
+            type="revolute">
+        <origin
+                xyz="0 0 0"
+                rpy="0 0 0"/>
+        <parent
+                link="world_pitch"/>
+        <child
+                link="world_yaw"/>
+        <axis
+                xyz="0 1 0"/>
+        <limit
+                lower="-3.14159"
+                upper="3.14159"
+                effort="59.8"
+                velocity="12.252"/>
+    </joint>
+    <link
+            name="world_yaw">
+        <inertial>
+            <origin
+                    xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <mass
+                    value="0.0"/>
+            <inertia
+                    ixx="0.0"
+                    ixy="0.0"
+                    ixz="0.0"
+                    iyy="0.0"
+                    iyz="0.0"
+                    izz="0.0"/>
+        </inertial>
+    </link>
+    <joint
+            name="floating_base_yaw_joint"
+            type="revolute">
+        <origin
+                xyz="0 0 0"
+                rpy="0 0 0"/>
+        <parent
+                link="world_yaw"/>
+        <child
+                link="world_roll"/>
+        <axis
+                xyz="0 0 1"/>
+        <limit
+                lower="-3.14159"
+                upper="3.14159"
+                effort="59.8"
+                velocity="12.252"/>
+    </joint>
+    <link
+            name="world_roll">
+        <inertial>
+            <origin
+                    xyz="0 0 0"
+                    rpy="0 0 0"/>
+            <mass
+                    value="0.0"/>
+            <inertia
+                    ixx="0.0"
+                    ixy="0.0"
+                    ixz="0.0"
+                    iyy="0.0"
+                    iyz="0.0"
+                    izz="0.0"/>
+        </inertial>
+    </link>
+    <joint
+            name="floating_base_roll_joint"
+            type="revolute">
         <origin
                 xyz="0 0 0.70"
                 rpy="0 0 0"/>
         <parent
-                link="world"/>
+                link="world_roll"/>
         <child
                 link="base_link"/>
+        <axis
+                xyz="1 0 0"/>
+        <limit
+                lower="-3.14159"
+                upper="3.14159"
+                effort="59.8"
+                velocity="12.252"/>
     </joint>
     <link
             name="base_link">
