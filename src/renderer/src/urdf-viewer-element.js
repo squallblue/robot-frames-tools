@@ -168,7 +168,12 @@ class URDFViewer extends HTMLElement {
         this.outputDataBtn.addEventListener('click', () => {
             const keys = Object.keys(this.robot.joints);
             const data = {}
-            keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
+            keys.forEach(name => data[name] = {
+                angle: this.robot.joints[name].angle || 0,
+                position: this.robot.joints[name].position,
+                origPosition: this.robot.joints[name].origPosition
+            })
+            // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
             // 复制到剪贴板
             navigator.clipboard.writeText(JSON.stringify(data))
             this.notyf.success('数据已复制到剪贴板')
@@ -266,7 +271,12 @@ class URDFViewer extends HTMLElement {
             if (this.recording && this.robot) {
                 const keys = Object.keys(this.robot.joints);
                 const data = {}
-                keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
+                keys.forEach(name => data[name] = {
+                    angle: this.robot.joints[name].angle || 0,
+                    position: this.robot.joints[name].position,
+                    origPosition: this.robot.joints[name].origPosition
+                })
+                // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
                 this.recordingData.push(data);
             } else if (this.replaying && this.robot) {
                 if (this.replayPos >= this.replayData.length) {
@@ -430,7 +440,6 @@ class URDFViewer extends HTMLElement {
     setJointValue(jointName, ...values) {
         if (!this.robot) return;
         if (!this.robot.joints[jointName]) return;
-
         if (this.robot.joints[jointName].setJointValue(...values)) {
 
             this.redraw();
@@ -442,7 +451,13 @@ class URDFViewer extends HTMLElement {
 
     setJointValues(values) {
 
-        for (const name in values) this.setJointValue(name, values[name]);
+        for (const name in values) {
+            if (values[name].angle || values[name].angle === 0) {
+                this.setJointValue(name, values[name].angle)
+            }  else {
+                this.setJointValue(name, values[name])
+            }
+        };
 
     }
 

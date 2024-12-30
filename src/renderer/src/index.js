@@ -367,7 +367,7 @@ document.addEventListener('WebComponentsReady', () => {
     // animToggle.addEventListener('click', () => animToggle.classList.toggle('checked'));
 
     // stop the animation if user tried to manipulate the model
-    viewer.addEventListener('manipulate-start', e => animToggle.classList.remove('checked'));
+    // viewer.addEventListener('manipulate-start', e => animToggle.classList.remove('checked'));
     viewer.addEventListener('urdf-processed', e => updateAngles());
     // updateLoop();
     viewer.camera.position.set(1.5, 1, -1.5);
