@@ -164,14 +164,15 @@ class URDFViewer extends HTMLElement {
         this.paused = false
         this.recording = false
         this.notyf = new Notyf({ position: { x: 'center', y: 'top' } });
-
         this.outputDataBtn.addEventListener('click', () => {
             const keys = Object.keys(this.robot.joints);
             const data = {}
+            const jointsPos = this.getJointWorldPositions()
             keys.forEach(name => data[name] = {
                 angle: this.robot.joints[name].angle || 0,
                 position: this.robot.joints[name].position,
-                origPosition: this.robot.joints[name].origPosition
+                origPosition: this.robot.joints[name].origPosition,
+                worldPosition: jointsPos[name]
             })
             // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
             // 复制到剪贴板
@@ -271,10 +272,12 @@ class URDFViewer extends HTMLElement {
             if (this.recording && this.robot) {
                 const keys = Object.keys(this.robot.joints);
                 const data = {}
+                const jointsPos = this.getJointWorldPositions()
                 keys.forEach(name => data[name] = {
                     angle: this.robot.joints[name].angle || 0,
                     position: this.robot.joints[name].position,
-                    origPosition: this.robot.joints[name].origPosition
+                    origPosition: this.robot.joints[name].origPosition,
+                    worldPosition: jointsPos[name]
                 })
                 // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
                 this.recordingData.push(data);
@@ -315,6 +318,17 @@ class URDFViewer extends HTMLElement {
             window.setJointValue = this.setJointValue.bind(this);
         }
 
+    }
+
+    getJointWorldPositions() {
+        const jointPositions = {};
+        for (const jointName in this.robot.joints) {
+            const joint = this.robot.joints[jointName];
+            const worldPosition = new THREE.Vector3();
+            joint.getWorldPosition(worldPosition);
+            jointPositions[jointName] = worldPosition;
+        }
+        return jointPositions;
     }
 
     autoMove() {
