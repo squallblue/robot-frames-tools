@@ -318,3 +318,15 @@ button + button {
       display: none;
   }
 }
+.urdf-btns {
+  display: flex;
+  margin-top: 12px;
+  gap: 12px;
+}
+.refresh-urdf {
+  width: 100px;
+}
+
+.urdf-dir {
+  width: 160px;
+}

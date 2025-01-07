@@ -3,16 +3,10 @@ import { join, resolve } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import express from 'express'
 import icon from '../../resources/icon.png?asset'
-import fs from 'fs'
+import { resourcesPath } from './resource'
+import './urdf'
 
 const server = express();
-let resourcesPath = resolve(__dirname, '../../resources');
-resourcesPath = resourcesPath.replace('app.asar', 'app.asar.unpacked');
-const serverAddress = 'http://127.0.0.1:3000';
-const urdfPath = resolve(resourcesPath, 'urdf');
-const urdfAddress = `${serverAddress}/urdf`;
-
-console.log('resourcesPath', resourcesPath);
 
 server.use(express.static(resourcesPath));
 

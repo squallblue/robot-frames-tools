@@ -236,13 +236,12 @@ viewer.addEventListener('urdf-processed', () => {
 
 });
 
-document.addEventListener('WebComponentsReady', async () => {
+const refreshURDF = async () => {
     const data = await fetchURDFConfig();
-    const html = data.map(item => `<li urdf="http://127.0.0.1:3000/urdf/${item}.urdf" color="#0086D1">${item}</li>`).join('');
+    const html = data.map(item => `<li urdf="http://127.0.0.1:3000/urdf/${item}" color="#0086D1">${item}</li>`).join('');
     console.log('html', html)
     document.querySelector('#urdf-options').innerHTML = html;
     setTimeout(() => {
-
         updateList();
         viewer.loadMeshFunc = (path, manager, done) => {
 
@@ -303,12 +302,27 @@ document.addEventListener('WebComponentsReady', async () => {
             updateList();
         });
     })
+}
 
-});
+const refreshURDFBtn = document.querySelector('.refresh-urdf')
+document.addEventListener('WebComponentsReady', refreshURDF);
+
+if (refreshURDF) {
+    refreshURDFBtn.addEventListener('click', refreshURDF);
+}
+
+const openURDFDir = async () => {
+    window.urdf.openDir();
+}
+
+const openURDFDirBtn = document.querySelector('.urdf-dir')
+
+if (openURDFDirBtn) {
+    openURDFDirBtn.addEventListener('click', openURDFDir);
+}
 
 const fetchURDFConfig = async () => {
-    const response = await fetch('http://127.0.0.1:3000/config.json');
-    const data = await response.json();
+    const data = await window.urdf.getList();
     console.log('data', data);
     return data;
 }
