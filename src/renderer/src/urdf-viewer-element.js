@@ -174,6 +174,14 @@ class URDFViewer extends HTMLElement {
                 origPosition: this.robot.joints[name].origPosition,
                 worldPosition: jointsPos[name]
             })
+            const linkKeys = Object.keys(this.robot.links);
+            const linksPos = this.getLinkWorldPositions()
+            linkKeys.forEach(name => {
+                data[name] = {
+                    position: this.robot.links[name].position,
+                    worldPosition: linksPos[name]
+                }
+            })
             // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
             // 复制到剪贴板
             navigator.clipboard.writeText(JSON.stringify(data))
@@ -264,6 +272,10 @@ class URDFViewer extends HTMLElement {
             polygonOffsetUnits: -1,
         });
 
+        window.sb = () => {
+            console.log(this.robot)
+        }
+
         const _renderLoop = () => {
             if (this.replaying && this.paused) {
                 this._renderLoopId = requestAnimationFrame(_renderLoop);
@@ -278,6 +290,14 @@ class URDFViewer extends HTMLElement {
                     position: this.robot.joints[name].position,
                     origPosition: this.robot.joints[name].origPosition,
                     worldPosition: jointsPos[name]
+                })
+                const linkKeys = Object.keys(this.robot.links);
+                const linksPos = this.getLinkWorldPositions()
+                linkKeys.forEach(name => {
+                    data[name] = {
+                        position: this.robot.links[name].position,
+                        worldPosition: linksPos[name]
+                    }
                 })
                 // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
                 this.recordingData.push(data);
@@ -329,6 +349,17 @@ class URDFViewer extends HTMLElement {
             jointPositions[jointName] = worldPosition;
         }
         return jointPositions;
+    }
+
+    getLinkWorldPositions() {
+        const linkPositions = {};
+        for (const linkName in this.robot.links) {
+            const link = this.robot.links[linkName];
+            const worldPosition = new THREE.Vector3();
+            link.getWorldPosition(worldPosition);
+            linkPositions[linkName] = worldPosition;
+        }
+        return linkPositions;
     }
 
     autoMove() {

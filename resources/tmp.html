@@ -6,20 +6,17 @@
   <meta charset="UTF-8" />
   <title>URDF Element</title>
 
-  <link href="./assets/main.css" type="text/css" rel="stylesheet" />
-  <link href="./assets/font.css" type="text/css" rel="stylesheet" />
   <link href="./notyf.min.css" type="text/css" rel="stylesheet" />
   <script src="./webcomponents-bundle.js"></script>
   <script src="./notyf.min.js"></script>
+  <script type="module" crossorigin src="./assets/index-d99kOQUH.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CO-4wOfv.css">
 </head>
 
 <body tabindex="0">
 
   <div id="menu">
-    <!-- <li urdf="./urdf/GR1T1.urdf" color="#0086D1">GR1T1</li> -->
-    <ul id="urdf-options">
-      <li urdf="http://127.0.0.1:3000/urdf/GRMini1T1_raw.urdf" color="#0086D1">GRMini1T1</li>
-    </ul>
+    <ul id="urdf-options"><li urdf="http://127.0.0.1:3000/urdf/GRMini1T1_raw.urdf" color="#0086D1">GRMini1T1_raw</li><li urdf="http://127.0.0.1:3000/urdf/GRMini1T1_raw_floating_base.urdf" color="#0086D1">GRMini1T1_raw_floating_base</li><li urdf="http://127.0.0.1:3000/urdf/GR1T1.urdf" color="#0086D1">GR1T1</li></ul>
 
     <div id="controls" class="hidden hide-fixed">
       <div id="toggle-controls"></div>
@@ -56,7 +53,6 @@
   </div>
   <urdf-viewer up="+Z" display-shadow tabindex="0"></urdf-viewer>
 
-  <script src="./src/index.js" type="module"></script>
 </body>
 
 </html>

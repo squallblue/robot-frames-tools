@@ -1,7 +1,20 @@
 import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import express from 'express'
 import icon from '../../resources/icon.png?asset'
+import fs from 'fs'
+
+const server = express();
+let resourcesPath = resolve(__dirname, '../../resources');
+resourcesPath = resourcesPath.replace('app.asar', 'app.asar.unpacked');
+const serverAddress = 'http://127.0.0.1:3000';
+const urdfPath = resolve(resourcesPath, 'urdf');
+const urdfAddress = `${serverAddress}/urdf`;
+
+console.log('resourcesPath', resourcesPath);
+
+server.use(express.static(resourcesPath));
 
 function createWindow() {
   // 获取窗口的宽度和高度
@@ -16,8 +29,15 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
+      webSecurity: false
     }
   })
+
+
+  // 启动静态文件服务器
+  server.listen(3000, () => {
+    console.log('Static file server running at http://localhost:3000');
+  });
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -33,7 +53,9 @@ function createWindow() {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    const renderPath = join(__dirname, '../renderer');
+    const htmlFilePath = join(renderPath, 'index.html');
+    mainWindow.loadFile(htmlFilePath)
   }
 }
 

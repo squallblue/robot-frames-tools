@@ -236,68 +236,82 @@ viewer.addEventListener('urdf-processed', () => {
 
 });
 
-document.addEventListener('WebComponentsReady', () => {
+document.addEventListener('WebComponentsReady', async () => {
+    const data = await fetchURDFConfig();
+    const html = data.map(item => `<li urdf="http://127.0.0.1:3000/urdf/${item}.urdf" color="#0086D1">${item}</li>`).join('');
+    console.log('html', html)
+    document.querySelector('#urdf-options').innerHTML = html;
+    setTimeout(() => {
 
-    viewer.loadMeshFunc = (path, manager, done) => {
+        updateList();
+        viewer.loadMeshFunc = (path, manager, done) => {
 
-        const ext = path.split(/\./g).pop().toLowerCase();
-        switch (ext) {
+            const ext = path.split(/\./g).pop().toLowerCase();
+            switch (ext) {
 
-            case 'gltf':
-            case 'glb':
-                new GLTFLoader(manager).load(
-                    path,
-                    result => done(result.scene),
-                    null,
-                    err => done(null, err),
-                );
-                break;
-            case 'obj':
-                new OBJLoader(manager).load(
-                    path,
-                    result => done(result),
-                    null,
-                    err => done(null, err),
-                );
-                break;
-            case 'dae':
-                new ColladaLoader(manager).load(
-                    path,
-                    result => done(result.scene),
-                    null,
-                    err => done(null, err),
-                );
-                break;
-            case 'stl':
-                new STLLoader(manager).load(
-                    path,
-                    result => {
-                        const material = new THREE.MeshPhongMaterial();
-                        const mesh = new THREE.Mesh(result, material);
-                        done(mesh);
-                    },
-                    null,
-                    err => done(null, err),
-                );
-                break;
+                case 'gltf':
+                case 'glb':
+                    new GLTFLoader(manager).load(
+                        path,
+                        result => done(result.scene),
+                        null,
+                        err => done(null, err),
+                    );
+                    break;
+                case 'obj':
+                    new OBJLoader(manager).load(
+                        path,
+                        result => done(result),
+                        null,
+                        err => done(null, err),
+                    );
+                    break;
+                case 'dae':
+                    new ColladaLoader(manager).load(
+                        path,
+                        result => done(result.scene),
+                        null,
+                        err => done(null, err),
+                    );
+                    break;
+                case 'stl':
+                    new STLLoader(manager).load(
+                        path,
+                        result => {
+                            const material = new THREE.MeshPhongMaterial();
+                            const mesh = new THREE.Mesh(result, material);
+                            done(mesh);
+                        },
+                        null,
+                        err => done(null, err),
+                    );
+                    break;
 
+            }
+
+        };
+
+        document.querySelector('li[urdf]').dispatchEvent(new Event('click'));
+
+        if (/javascript\/example\/bundle/i.test(window.location)) {
+            viewer.package = '../../../urdf';
         }
 
-    };
-
-    document.querySelector('li[urdf]').dispatchEvent(new Event('click'));
-
-    if (/javascript\/example\/bundle/i.test(window.location)) {
-        viewer.package = '../../../urdf';
-    }
-
-    registerDragEvents(viewer, () => {
-        setColor('#263238');
-        // animToggle.classList.remove('checked');
-        updateList();
-    });
+        registerDragEvents(viewer, () => {
+            setColor('#263238');
+            // animToggle.classList.remove('checked');
+            updateList();
+        });
+    })
 
 });
+
+const fetchURDFConfig = async () => {
+    const response = await fetch('http://127.0.0.1:3000/config.json');
+    const data = await response.json();
+    console.log('data', data);
+    return data;
+}
 
 // init 2D UI and animation
 const updateAngles = () => {
@@ -359,8 +373,6 @@ const updateList = () => {
     });
 
 };
-
-updateList();
 
 document.addEventListener('WebComponentsReady', () => {
 
