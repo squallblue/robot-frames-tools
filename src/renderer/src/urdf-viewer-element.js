@@ -281,6 +281,29 @@ class URDFViewer extends HTMLElement {
                 this._renderLoopId = requestAnimationFrame(_renderLoop);
                 return
             }
+            
+            if (this.parentNode) {
+
+                this.updateSize();
+
+                if (this._dirty || this.autoRedraw) {
+
+                    if (!this.noAutoRecenter) {
+
+                        this._updateEnvironment();
+                    }
+                    this.renderer.render(scene, camera);
+                    this._dirty = false;
+
+                }
+
+                // update controls after the environment in
+                // case the controls are retargeted
+                this.controls.update();
+
+            }
+            this._renderLoopId = requestAnimationFrame(_renderLoop);
+
             if (this.recording && this.robot) {
                 const keys = Object.keys(this.robot.joints);
                 const data = {}
@@ -308,27 +331,6 @@ class URDFViewer extends HTMLElement {
                 this.setJointValues(this.replayData[this.replayPos++]);
             }
 
-            if (this.parentNode) {
-
-                this.updateSize();
-
-                if (this._dirty || this.autoRedraw) {
-
-                    if (!this.noAutoRecenter) {
-
-                        this._updateEnvironment();
-                    }
-                    this.renderer.render(scene, camera);
-                    this._dirty = false;
-
-                }
-
-                // update controls after the environment in
-                // case the controls are retargeted
-                this.controls.update();
-
-            }
-            this._renderLoopId = requestAnimationFrame(_renderLoop);
 
         };
         _renderLoop();
@@ -363,6 +365,38 @@ class URDFViewer extends HTMLElement {
     }
 
     autoMove() {
+    }
+
+    showGrid() {
+        if (!this.axesHelper) {
+            // 创建坐标轴辅助对象
+            this.axesHelper = new THREE.AxesHelper(5); // 参数表示轴的长度
+            this.axesHelper.raycast = () => {}; // 禁用交互
+            this.scene.add(this.axesHelper);
+        }
+
+        if (!this.gridHelper) {
+            // 创建网格辅助对象
+            this.gridHelper = new THREE.GridHelper(10, 10); // 参数表示网格的大小和分段数
+            this.gridHelper.raycast = () => {}; // 禁用交互
+            this.scene.add(this.gridHelper);
+        }
+        // 刷新 scene
+        this.renderer.render(this.scene, this.camera);
+        
+    }
+
+    hideGrid() {
+        if (this.axesHelper) {
+            this.scene.remove(this.axesHelper);
+            this.axesHelper = null;
+        }
+        if (this.gridHelper) {
+            this.scene.remove(this.gridHelper);
+            this.gridHelper = null;
+        }
+        // 刷新 scene
+        this.renderer.render(this.scene, this.camera);
     }
 
     connectedCallback() {
@@ -514,7 +548,6 @@ class URDFViewer extends HTMLElement {
 
         const robot = this.robot;
         if (!robot) return;
-
         this.world.updateMatrixWorld();
 
         const bbox = new THREE.Box3();
