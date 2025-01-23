@@ -142,10 +142,76 @@ viewer.addEventListener('manipulate-end', e => {
 
 });
 
+function updateRobotPos(x,y,z) {
+    viewer.robot.position.set(x,y,z)
+    viewer._updateEnvironment();
+    viewer.renderer.render(viewer.scene, viewer.camera);
+    viewer.controls.update();
+}
+
+
+function updatePosByRange() {
+    const x = document.querySelector('#pos-x input[type="range"]').value;
+    const y = document.querySelector('#pos-y input[type="range"]').value;
+    const z = document.querySelector('#pos-z input[type="range"]').value;
+
+    // 更新输入框的值
+    document.querySelector('#pos-x input[type="number"]').value = x;
+    document.querySelector('#pos-y input[type="number"]').value = y;
+    document.querySelector('#pos-z input[type="number"]').value = z;
+
+    updateRobotPos(x,y,z);
+}
+
+function updatePosByInput() {
+    const x = document.querySelector('#pos-x input[type="number"]').value;
+    const y = document.querySelector('#pos-y input[type="number"]').value;
+    const z = document.querySelector('#pos-z input[type="number"]').value;
+
+    // 更新滑块的值
+    document.querySelector('#pos-x input[type="range"]').value = x;
+    document.querySelector('#pos-y input[type="range"]').value = y;
+    document.querySelector('#pos-z input[type="range"]').value = z;
+
+    updateRobotPos(x,y,z);
+}
+
+function createPosSlider(pos) {
+    const li = document.createElement('li');
+    li.id = `pos-${pos}`
+    li.innerHTML = `<span title="${pos}">${pos}</span>
+            <input type="range" value="0" step="0.001" max="10" min="-10"/>
+            <input type="number" step="0.001" value="0" />`
+    sliderList.appendChild(li);
+    
+    const slider = li.querySelector('input[type="range"]');
+    const input = li.querySelector('input[type="number"]');
+
+    
+    slider.addEventListener('input', () => {
+        updatePosByRange()
+    });
+
+    input.addEventListener('change', () => {
+        updatePosByInput()
+    });
+}
+
+function removePosSliderIfExists() {
+    const posSliders = document.querySelectorAll('#controls li[id^="pos-"]');
+    posSliders.forEach(slider => {
+        slider.remove();
+    })
+}
+
 // create the sliders
 viewer.addEventListener('urdf-processed', () => {
 
     const r = viewer.robot;
+    removePosSliderIfExists();
+    createPosSlider('x');
+    createPosSlider('y');
+    createPosSlider('z');
     Object
         .keys(r.joints)
         .sort((a, b) => {

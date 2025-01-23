@@ -236,7 +236,7 @@ input:focus {
 }
 
 #controls li input[type="number"] {
-  width: 50px;
+  width: 64px;
   overflow: hidden;
 }
 

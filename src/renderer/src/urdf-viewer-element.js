@@ -3,6 +3,8 @@ import { MeshPhongMaterial } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import URDFLoader from './URDFLoader.js';
 
+const viewer = document.querySelector('urdf-viewer');
+
 const tempVec2 = new THREE.Vector2();
 const emptyRaycast = () => {};
 // urdf-viewer element
@@ -182,6 +184,11 @@ class URDFViewer extends HTMLElement {
                     worldPosition: linksPos[name]
                 }
             })
+            data.robotPos = {
+                x: +this.robot.position.x,
+                y: +this.robot.position.y,
+                z: +this.robot.position.z
+            }
             // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
             // 复制到剪贴板
             navigator.clipboard.writeText(JSON.stringify(data))
@@ -322,12 +329,19 @@ class URDFViewer extends HTMLElement {
                         worldPosition: linksPos[name]
                     }
                 })
+                data.robotPos = {
+                    x: +this.robot.position.x,
+                    y: +this.robot.position.y,
+                    z: +this.robot.position.z
+                }
                 // keys.forEach(name => data[name] = this.robot.joints[name].angle || 0 )
                 this.recordingData.push(data);
             } else if (this.replaying && this.robot) {
                 if (this.replayPos >= this.replayData.length) {
                     this.replayPos = 0;
                 }
+                
+                this.updateRobotPos(this.replayData[this.replayPos].robotPos)
                 this.setJointValues(this.replayData[this.replayPos++]);
             }
 
@@ -340,6 +354,21 @@ class URDFViewer extends HTMLElement {
             window.setJointValue = this.setJointValue.bind(this);
         }
 
+    }
+
+    updateRobotPos({ x, y, z }) {
+        this.robot.position.set(x,y,z)
+        // 更新滑块的值
+        document.querySelector('#pos-x input[type="range"]').value = x;
+        document.querySelector('#pos-y input[type="range"]').value = y;
+        document.querySelector('#pos-z input[type="range"]').value = z;
+        // 更新输入框的值
+        document.querySelector('#pos-x input[type="number"]').value = x;
+        document.querySelector('#pos-y input[type="number"]').value = y;
+        document.querySelector('#pos-z input[type="number"]').value = z;
+        viewer._updateEnvironment();
+        viewer.renderer.render(viewer.scene, viewer.camera);
+        viewer.controls.update();
     }
 
     getJointWorldPositions() {
