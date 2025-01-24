@@ -32,3 +32,7 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+
+# 更新记录
+## v1.0.0.5
+新增了空间坐标XYZ的调整
